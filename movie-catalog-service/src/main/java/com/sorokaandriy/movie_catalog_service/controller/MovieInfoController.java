@@ -14,7 +14,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/movies")
+@RequestMapping("/movies-catalog")
 public class MovieInfoController {
 
     private final MovieInfoRepository repository;
