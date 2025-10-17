@@ -1,13 +1,11 @@
 package com.sorokaandriy.movie_streaming_service.controller;
 
+import com.sorokaandriy.movie_streaming_service.service.MovieCatalogService;
 import com.sorokaandriy.movie_streaming_service.service.MovieStreamService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
 
@@ -15,20 +13,31 @@ import java.io.FileNotFoundException;
 @RequestMapping("/movies")
 public class MovieStreamController {
 
-    private final MovieStreamService service;
+    public final static String DIRECTORY = "C:\\Users\\D\\Videos\\NVIDIA\\";
 
-    public MovieStreamController(MovieStreamService service) {
+    private final MovieStreamService service;
+    private final MovieCatalogService catalogService;
+
+    public MovieStreamController(MovieStreamService service, MovieCatalogService catalogService) {
         this.service = service;
+        this.catalogService = catalogService;
     }
 
-    @GetMapping("/{videoPath}")
-    public ResponseEntity<InputStreamResource> streamVideo(@PathVariable String videoPath) {
+    @GetMapping
+    public ResponseEntity<InputStreamResource> streamVideo(@RequestParam("videoPath") String videoPath) {
         try {
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("video/mp4"))
-                    .body(service.streamVideo(videoPath));
+                    .body(service.streamVideo(DIRECTORY + videoPath));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InputStreamResource> streamVideoById(@PathVariable Long id) {
+        String path = catalogService.getMoviePath(id);
+        return streamVideo(path);
+    }
+
 }
